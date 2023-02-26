@@ -68,6 +68,7 @@
 
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
+          <!--标签中根据路由跳转-->
           <router-link :to="'/teacher/edit/'+scope.row.id">
             <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
           </router-link>
@@ -122,13 +123,8 @@ export default{
             // console.log(response)
           this.list = response.data.rows
           this.total = response.data.total
-          console.log(this.list)
-          console.log(this.total)
-
-          }
-        )
-        .catch(error => {
-            console.log(error)
+          // console.log(this.list)
+          // console.log(this.total)
           }
         )
     },

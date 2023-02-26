@@ -52,12 +52,44 @@ export default {
   },
 
   created() {
+    this.init()
 
   },
-
+  watch: {  //监听
+    $route(to, from) { //路由变化方式，路由发生变化，方法就会执行
+      this.init()
+    }
+  },
   methods:{
+    init() {
+      //判断路径有id值,做修改
+      if(this.$route.params && this.$route.params.id) {
+        //从路径获取id值
+        const id = this.$route.params.id
+        //调用根据id查询的方法
+        this.getInfo(id)
+      } else { //路径没有id值，做添加
+        //清空表单
+        this.teacher = {}
+      }
+    },
+    //根据讲师id查询的方法
+    getInfo(id) {
+      teacherApi.getTeacherInfo(id)
+        .then(response => {
+          this.teacher = response.data.teacher
+        })
+    },
     saveOrUpdate(){
-      this.saveTeacher()
+      //判断修改还是添加
+      //根据teacher是否有id
+      if(!this.teacher.id) {
+        //添加
+        this.saveTeacher()
+      } else {
+        //修改
+        this.updateTeacher()
+      }
 
     },
     saveTeacher(){
@@ -67,6 +99,19 @@ export default {
           this.$message({
             type: 'success',
             message: '添加成功!'
+          });
+          //回到列表页面 路由跳转
+          this.$router.push({path:'/teacher/table'})
+        })
+
+    },
+    updateTeacher(){
+      teacherApi.updateTeacherInfo(this.teacher)
+        .then(response => {//添加成功
+          //提示信息
+          this.$message({
+            type: 'success',
+            message: '修改成功!'
           });
           //回到列表页面 路由跳转
           this.$router.push({path:'/teacher/table'})
