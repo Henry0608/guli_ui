@@ -38,7 +38,7 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/edu',
+    path: '/teacher',
     component: Layout,
     redirect: '/edu/table',
     name: '讲师管理',
