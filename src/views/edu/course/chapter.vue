@@ -9,11 +9,19 @@
       <el-step title="创建课程大纲"/>
       <el-step title="最终发布"/>
     </el-steps>
+    <el-button type="text" @click="openChapterDialog()">添加章节</el-button>
 
     <!-- 章节 -->
     <ul class="chanpterList">
       <li v-for="chapter in chapterVideoList" :key="chapter.id">
-        <p>{{ chapter.title }}</p>
+        <p>
+          {{ chapter.title }}
+          <span class="acts">
+            <el-button style="" type="text" @click="openVideo(chapter.id)">添加小节</el-button>
+            <el-button style="" type="text" @click="openEditChatper(chapter.id)">编辑</el-button>
+            <el-button type="text" @click="removeChapter(chapter.id)">删除</el-button>
+          </span>
+        </p>
         <!-- 视频 -->
         <ul class="chanpterList videoList">
           <li v-for="video in chapter.children" :key="video.id">
@@ -30,6 +38,22 @@
         <el-button :disabled="saveBtnDisabled" type="primary" @click="next">下一步</el-button>
       </el-form-item>
     </el-form>
+
+    <!-- 添加和修改章节表单 -->
+    <el-dialog :visible.sync="dialogChapterFormVisible" title="添加章节">
+      <el-form :model="chapter" label-width="120px">
+        <el-form-item label="章节标题">
+          <el-input v-model="chapter.title"/>
+        </el-form-item>
+        <el-form-item label="章节排序">
+          <el-input-number v-model="chapter.sort" :min="0" controls-position="right"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogChapterFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveOrUpdate">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -41,7 +65,12 @@ import chapter from '@/api/edu/chapter'
         //是否禁用，默认关闭
         saveBtnDisabled:false,
         courseId:'',
-        chapterVideoList:[]
+        chapterVideoList:[],
+        chapter:{ //封装章节数据
+          title: '',
+          sort: 0
+        },
+        dialogChapterFormVisible: false //章节弹框
 
       }
     },
@@ -54,6 +83,82 @@ import chapter from '@/api/edu/chapter'
 
     },
     methods:{
+      //删除章节
+      removeChapter(chapterId) {
+        this.$confirm('此操作将删除章节, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {  //点击确定，执行then方法
+          //调用删除的方法
+          chapter.deleteChapter(chapterId)
+            .then(response =>{//删除成功
+              //提示信息
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+              //刷新页面
+              this.getChapterVideo()
+            })
+        }) //点击取消，执行catch方法
+      },
+      //修改章节弹框数据回显
+      openEditChatper(chapterId) {
+        //弹框
+        this.dialogChapterFormVisible = true
+        //调用接口
+        chapter.getChapter(chapterId)
+          .then(response => {
+            this.chapter = response.data.chapter
+          })
+      },
+      //弹出添加章节页面
+      openChapterDialog(){
+        this.dialogChapterFormVisible = true
+        this.chapter = {
+          title: '',
+          sort: 0
+        }
+      },
+      //添加章节
+      addChapter() {
+        this.chapter.courseId = this.courseId
+        chapter.addChapter(this.chapter)
+          .then(response => {
+            //关闭弹框
+            this.dialogChapterFormVisible = false
+            //提示
+            this.$message({
+              type: 'success',
+              message: '添加章节成功!'
+            });
+            //刷新页面
+            this.getChapterVideo()
+          })
+      },
+      updateChapter(){
+        chapter.updateChapter(this.chapter)
+          .then(response =>  {
+            //关闭弹框
+            this.dialogChapterFormVisible = false
+            //提示
+            this.$message({
+              type: 'success',
+              message: '修改章节成功!'
+            });
+            //刷新页面
+            this.getChapterVideo()
+          })
+
+      },
+      saveOrUpdate(){
+        if (!this.chapter.id){
+          this.addChapter()
+        }else{
+          this.updateChapter()
+        }
+      },
       //根据课程id查询章节和小节
       getChapterVideo(){
         chapter.getAllChapterVideo(this.courseId)
@@ -95,10 +200,14 @@ import chapter from '@/api/edu/chapter'
     line-height: 50px;
     width: 100%;
     border: 1px solid #DDD;
+    position: relative;
+
   }
   .chanpterList .acts {
     float: right;
     font-size: 14px;
+    position: relative;
+    z-index: 1;
   }
 
   .videoList{
