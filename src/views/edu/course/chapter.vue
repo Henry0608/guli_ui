@@ -10,6 +10,19 @@
       <el-step title="最终发布"/>
     </el-steps>
 
+    <!-- 章节 -->
+    <ul class="chanpterList">
+      <li v-for="chapter in chapterVideoList" :key="chapter.id">
+        <p>{{ chapter.title }}</p>
+        <!-- 视频 -->
+        <ul class="chanpterList videoList">
+          <li v-for="video in chapter.children" :key="video.id">
+            <p>{{ video.title }} </p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
     <el-form label-width="120px">
 
       <el-form-item>
@@ -21,19 +34,33 @@
 </template>
 
 <script>
-
+import chapter from '@/api/edu/chapter'
   export default {
     data(){
       return{
         //是否禁用，默认关闭
         saveBtnDisabled:false,
+        courseId:'',
+        chapterVideoList:[]
 
       }
     },
     created() {
+      if(this.$route.params && this.$route.params.id){
+        this.courseId = this.$route.params.id
+        //初始化调用根据id查询章节和小节的方法
+        this.getChapterVideo()
+      }
 
     },
     methods:{
+      //根据课程id查询章节和小节
+      getChapterVideo(){
+        chapter.getAllChapterVideo(this.courseId)
+          .then(response =>{
+            this.chapterVideoList = response.data.allChapterVideo
+          })
+      },
       previous(){
         //跳转到第一步
         this.$router.push({path:'/course/info/1'})
@@ -48,8 +75,45 @@
     }
 
   }
-
-
-
 </script>
 
+<style scoped>
+  .chanpterList{
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .chanpterList li{
+    position: relative;
+  }
+  .chanpterList p{
+    float: left;
+    font-size: 20px;
+    margin: 10px 0;
+    padding: 10px;
+    height: 70px;
+    line-height: 50px;
+    width: 100%;
+    border: 1px solid #DDD;
+  }
+  .chanpterList .acts {
+    float: right;
+    font-size: 14px;
+  }
+
+  .videoList{
+    padding-left: 50px;
+  }
+  .videoList p{
+    float: left;
+    font-size: 14px;
+    margin: 10px 0;
+    padding: 10px;
+    height: 50px;
+    line-height: 30px;
+    width: 100%;
+    border: 1px dotted #DDD;
+  }
+
+</style>
