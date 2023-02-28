@@ -63,14 +63,13 @@ import chapter from '@/api/edu/chapter'
       },
       previous(){
         //跳转到第一步
-        this.$router.push({path:'/course/info/1'})
+        this.$router.push({path:'/course/info/'+this.courseId})
 
       },
       next(){
         //跳转到第三步
-        this.$router.push({path:'/course/publish/3'})
+        this.$router.push({path:'/course/publish/'+this.courseId})
       }
-
 
     }
 
