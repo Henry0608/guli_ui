@@ -77,6 +77,7 @@
 <script>
   //引入调用teacher.js文件
   import course from '@/api/edu/course'
+  import video from '@/api/edu/video'
 
   export default {
     //写核心代码位置
@@ -109,6 +110,26 @@
         this.courseQuery = {}
         //查询所有讲师数据
         this.getList()
+      },
+      removeDataById(courseId){
+        this.$confirm('此操作将删除课程, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {  //点击确定，执行then方法
+          //调用删除的方法
+          course.deleteCourse(courseId)
+            .then(response =>{//删除成功
+              //提示信息
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+              //刷新页面
+              this.getList()
+            })
+        }) //点击取消，执行catch方法
+
       }
 
     }
