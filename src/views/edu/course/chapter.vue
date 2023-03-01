@@ -144,7 +144,30 @@ import video from '@/api/edu/video'
 
     },
     methods:{
-      // ==================小节操作=========================
+      // ==================上传视频=========================
+      //点击确定调用的方法
+      handleVodRemove() {
+        //调用接口的删除视频的方法
+        video.deleteAliyunvod(this.video.videoSourceId)
+          .then(response => {
+            //提示信息
+            this.$message({
+              type: 'success',
+              message: '删除视频成功!'
+            });
+            //把文件列表清空
+            this.fileList = []
+            //把video视频id和视频名称值清空
+            //上传视频id赋值
+            this.video.videoSourceId = ''
+            //上传视频名称赋值
+            this.video.videoOriginalName = ''
+          })
+      },
+      //点击×调用这个方法,弹出确认框
+      beforeVodRemove(file,fileList) {
+        return this.$confirm(`确定移除 ${ file.name }？`);
+      },
       //上传视频成功调用的方法
       handleVodUploadSuccess(response, file, fileList) {
         //上传视频id赋值
@@ -155,6 +178,7 @@ import video from '@/api/edu/video'
       handleUploadExceed() {
         this.$message.warning('想要重新上传视频，请先删除已上传的视频')
       },
+      // ==================小节操作=========================
       //删除章节
       removeVideo(videoId) {
         this.$confirm('此操作将删除小节节, 是否继续?', '提示', {
