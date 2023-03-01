@@ -44,5 +44,13 @@ export default {
       method: 'post'
     })
   },
+  //TODO 课程列表
+  //课程列表显示
+  getListCourse() {
+    return request({
+      url: '/eduservice/course',
+      method: 'get'
+    })
+  }
 
 }
