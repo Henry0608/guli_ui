@@ -209,6 +209,9 @@ import video from '@/api/edu/video'
           free: 0,
           videoSourceId: ''
         }
+        // 清空
+        // this.video = {}
+        this.fileList = []
         this.video.chapterId = chapterId
 
       },
